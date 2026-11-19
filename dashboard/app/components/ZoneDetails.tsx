@@ -46,6 +46,14 @@ function SensorGroup({ title, sensors }: { title: string; sensors: Sensor[] }) {
   );
 }
 
+// Fixed locale + time zone so the server and browser render the same text.
+const timeFormat = new Intl.DateTimeFormat("en-GB", {
+  timeZone: "Asia/Bangkok",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+});
+
 type ZoneDetailsProps = {
   location: LocationRanking;
   zone: RankedZone;
@@ -61,6 +69,9 @@ export default function ZoneDetails({ location, zone }: ZoneDetailsProps) {
         <div className="min-w-0">
           <p className="truncate text-sm">{location.name}</p>
           <h2 className="text-xl font-bold text-[#2B2B2B]">{zone.zone}</h2>
+          <p className="text-xs text-[#6B6B6B]">
+            {zone.updatedAt ? `Live · updated ${timeFormat.format(zone.updatedAt)}` : "Sample data"}
+          </p>
         </div>
         <div className="shrink-0 text-right">
           <p className="text-sm">Score</p>

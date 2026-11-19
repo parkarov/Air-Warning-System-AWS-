@@ -1,12 +1,25 @@
+import { Suspense } from "react";
 import Bar from "./components/Bar";
 import CampusMap from "./components/CampusMap";
+import Loading from "./components/Loading";
 import RankingList from "./components/RankingList";
 import { getMapPins, getRankings } from "./data/rankings";
+import { getLocations, unassignedSites } from "./data/sensors";
 
 const SHOWN = 4;
 
 export default function HomePage() {
-  const rankings = getRankings();
+  // Live data is fetched at request time, so it streams in behind a fallback.
+  return (
+    <Suspense fallback={<Loading />}>
+      <Home />
+    </Suspense>
+  );
+}
+
+async function Home() {
+  const locations = await getLocations();
+  const rankings = getRankings(locations);
   const best = rankings.slice(0, SHOWN);
   const worst = rankings.slice(-SHOWN).reverse(); // worst first
 
@@ -27,7 +40,7 @@ export default function HomePage() {
       <section className="flex min-h-80 flex-1 flex-col border-[#9A9A9A] md:border-l">
         <Bar className="px-5 py-1 text-lg font-bold">Map</Bar>
         {/* Pins link to the Map page with that site selected */}
-        <CampusMap pins={getMapPins()} linkTo="/map" className="min-h-80 flex-1" />
+        <CampusMap pins={getMapPins(locations, unassignedSites)} linkTo="/map" className="min-h-80 flex-1" />
       </section>
     </div>
   );
